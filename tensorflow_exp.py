@@ -19,6 +19,7 @@ class FasttextModel(tf.keras.Model):
     def __init__(self, vocab_size, label_num, dim=100):
         super().__init__()
         self.embedding_layer = tf.keras.layers.Embedding(vocab_size, dim)
+        # self.dense_layer = tf.keras.layers.Dense(label_num, activation=tf.nn.sigmoid)
         self.dense_layer = tf.keras.layers.Dense(label_num, activation=tf.nn.softmax)
         
     def call(self, inputs, training=False):
@@ -45,7 +46,7 @@ def evaluate_model(model, x, y_true):
     return report
 
 if __name__ == "__main__":
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
     test_src = pickle.load(open("data/tensorflow/test.src.pkl", "rb"))
     test_tgt = pickle.load(open("data/tensorflow/test.tgt.pkl", "rb"))
@@ -55,8 +56,9 @@ if __name__ == "__main__":
     vocab_size = len([line.strip() for line in open("data/tensorflow/vocab.txt")])
     label_num = len([line.strip() for line in open("data/tensorflow/label.txt")])
     model = FasttextModel(vocab_size=vocab_size, label_num=label_num, dim=300)
-    model.compile(optimizer='adam', loss=MyLoss(label_num))
-    model.fit(x=train_src, y=train_tgt, batch_size=1024, epochs=50)
+    # model.compile(optimizer=tf.keras.optimizers.SGD(0.05), loss=MyLoss(label_num))
+    model.compile(optimizer=tf.keras.optimizers.Adam(), loss=MyLoss(label_num))
+    model.fit(x=train_src, y=train_tgt, batch_size=1024, epochs=20)
     report = evaluate_model(model, test_src, test_tgt)
     print(report)
     with open("log/tensorflow_exp.log", "w+") as fp:

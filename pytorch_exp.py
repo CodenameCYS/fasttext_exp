@@ -30,6 +30,7 @@ class FasttextModel(torch.nn.Module):
 def train_model(x, y, vocab_size, label_num, epochs=20, dim=300, batch_size=1024):
     model = FasttextModel(vocab_size, label_num, dim)
     optimizer = torch.optim.Adam(model.parameters())
+    # optimizer = torch.optim.SGD(model.parameters(), lr=0.05)
     loss_fn = torch.nn.CrossEntropyLoss()
 
     for epoch in range(epochs):
@@ -48,12 +49,12 @@ def train_model(x, y, vocab_size, label_num, epochs=20, dim=300, batch_size=1024
     return model
 
 def evaluate_model(model, x, y_true):
-    y_pred = torch.argmax(model(torch.tensor(x))).tolist()
+    y_pred = torch.argmax(model(torch.tensor(x)), axis=-1).tolist()
     report = classification_report(y_true, y_pred)
     return report
 
 if __name__ == "__main__":
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
     test_src = pickle.load(open("data/tensorflow/test.src.pkl", "rb"))
     test_tgt = pickle.load(open("data/tensorflow/test.tgt.pkl", "rb"))
@@ -62,8 +63,8 @@ if __name__ == "__main__":
 
     vocab_size = len([line.strip() for line in open("data/tensorflow/vocab.txt")])
     label_num = len([line.strip() for line in open("data/tensorflow/label.txt")])
-    model = train_model(train_src, train_tgt, vocab_size, label_num, epochs=10, dim=300, batch_size=1024)
+    model = train_model(train_src, train_tgt, vocab_size, label_num, epochs=20, dim=300, batch_size=1024)
     report = evaluate_model(model, test_src, test_tgt)
     print(report)
-    with open("log/tensorflow_exp.log", "w+") as fp:
+    with open("log/pytorch_exp.log", "w+") as fp:
         fp.write(report)
