@@ -34,10 +34,9 @@ def train_model(x, y, vocab_size, label_num, epochs=20, dim=300, batch_size=1024
     loss_fn = torch.nn.CrossEntropyLoss()
 
     for epoch in range(epochs):
-        optimizer.zero_grad()
-
         with tqdm(range((len(x)-1) // batch_size + 1), ncols=100) as t:
             for i in t:
+                optimizer.zero_grad()
                 y_pred = model(torch.tensor(x[i*batch_size:(i+1)*batch_size]))
                 y_true = torch.tensor(y[i*batch_size:(i+1)*batch_size])
                 loss = loss_fn(y_pred, y_true)
@@ -54,7 +53,7 @@ def evaluate_model(model, x, y_true):
     return report
 
 if __name__ == "__main__":
-    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
     test_src = pickle.load(open("data/tensorflow/test.src.pkl", "rb"))
     test_tgt = pickle.load(open("data/tensorflow/test.tgt.pkl", "rb"))
@@ -63,7 +62,7 @@ if __name__ == "__main__":
 
     vocab_size = len([line.strip() for line in open("data/tensorflow/vocab.txt")])
     label_num = len([line.strip() for line in open("data/tensorflow/label.txt")])
-    model = train_model(train_src, train_tgt, vocab_size, label_num, epochs=20, dim=300, batch_size=1024)
+    model = train_model(train_src, train_tgt, vocab_size, label_num, epochs=50, dim=300, batch_size=1024)
     report = evaluate_model(model, test_src, test_tgt)
     print(report)
     with open("log/pytorch_exp.log", "w+") as fp:

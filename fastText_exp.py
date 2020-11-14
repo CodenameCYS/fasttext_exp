@@ -17,7 +17,7 @@ def evaluate_model(test_file):
     return report
 
 if __name__ == "__main__":
-    model = fasttext.train_supervised('data/fasttext/train.txt', epoch=20, lr=0.05, dim=300, maxn=128)
+    model = fasttext.train_supervised('data/fasttext/train.txt', epoch=50, lr=0.05, dim=300, maxn=128)
     report = evaluate_model('data/fasttext/test.txt')
     print(report)
     with open("log/fasttext_exp.log", "w+") as fp:

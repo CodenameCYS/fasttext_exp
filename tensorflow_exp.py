@@ -58,7 +58,7 @@ if __name__ == "__main__":
     model = FasttextModel(vocab_size=vocab_size, label_num=label_num, dim=300)
     # model.compile(optimizer=tf.keras.optimizers.SGD(0.05), loss=MyLoss(label_num))
     model.compile(optimizer=tf.keras.optimizers.Adam(), loss=MyLoss(label_num))
-    model.fit(x=train_src, y=train_tgt, batch_size=1024, epochs=20)
+    model.fit(x=train_src, y=train_tgt, batch_size=1024, epochs=40)
     report = evaluate_model(model, test_src, test_tgt)
     print(report)
     with open("log/tensorflow_exp.log", "w+") as fp:
