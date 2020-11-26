@@ -4,34 +4,44 @@ import torch
 from tqdm import tqdm
 from sklearn.metrics import classification_report
 
-class MyDense:
+class MyDense(torch.nn.Module):
     def __init__(self, input_dim, output_dim):
+        super().__init__()
         self.linear = torch.nn.Linear(input_dim, output_dim)
     
-    def __call__(self, x):
+    def forward(self, x):
         return torch.nn.functional.softmax(self.linear(x), dim=-1)
 
 class FasttextModel(torch.nn.Module):
     def __init__(self, vocab_size, label_num, dim=100):
         super().__init__()
         self.embedding_layer = torch.nn.Embedding(vocab_size, dim)
-        self.dense_layer = MyDense(dim, label_num)
+        # self.dense_layer = MyDense(dim, label_num)
+        self.dense_layer = torch.nn.Linear(dim, label_num)
         
     def forward(self, inputs):
         # print(inputs.shape)
         m = self.embedding_layer(inputs)
         # print(m.shape)
-        m = torch.mean(m, axis=1)
+        m = torch.mean(m, dim=1)
         # print("m", m.shape)
         logits = self.dense_layer(m)
         # print("logits", logits.shape)
         return logits
+
+def cross_entropy(y_pred, y_true):
+    # y_pred = torch.nn.functional.softmax(y_pred, dim=-1)
+    category = y_pred.size()[-1]
+    y_true = torch.nn.functional.one_hot(y_true, num_classes=category)
+    loss = - y_true * torch.log(y_pred)
+    return torch.mean(torch.sum(loss, dim=-1))
 
 def train_model(x, y, vocab_size, label_num, epochs=20, dim=300, batch_size=1024):
     model = FasttextModel(vocab_size, label_num, dim)
     optimizer = torch.optim.Adam(model.parameters())
     # optimizer = torch.optim.SGD(model.parameters(), lr=0.05)
     loss_fn = torch.nn.CrossEntropyLoss()
+    # loss_fn = cross_entropy
 
     for epoch in range(epochs):
         with tqdm(range((len(x)-1) // batch_size + 1), ncols=100) as t:
