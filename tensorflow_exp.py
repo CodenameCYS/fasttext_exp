@@ -46,7 +46,7 @@ def evaluate_model(model, x, y_true):
     return report
 
 if __name__ == "__main__":
-    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
     test_src = pickle.load(open("data/tensorflow/test.src.pkl", "rb"))
     test_tgt = pickle.load(open("data/tensorflow/test.tgt.pkl", "rb"))
